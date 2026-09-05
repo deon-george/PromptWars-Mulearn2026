@@ -188,3 +188,11 @@ footer.footer {
 
 img, video { width: 100%; border-radius: 12px; display: block; }
 .empty { color: var(--muted); }
+
+.verification-sections { display: grid; gap: 12px; }
+.verification-section { display: grid; gap: 6px; }
+.verification-section strong { color: var(--text); font-size: 13px; }
+.kv-list { list-style: none; padding: 0; margin: 6px 0 0; display: grid; gap: 4px; }
+.kv-list li { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; }
+.kv-key { color: var(--muted); }
+.kv-val { color: var(--text); text-align: right; word-break: break-word; }

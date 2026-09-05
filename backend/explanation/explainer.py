@@ -22,7 +22,7 @@ class ExplanationLayer:
     
     def __init__(self, use_gemini: bool = False, gemini_model: Optional[str] = None):
         self.use_gemini = use_gemini
-        self.gemini_model = gemini_model or os.getenv('GEMINI_MODEL', 'gemini-2.0-flash')
+        self.gemini_model = gemini_model or os.getenv('GEMINI_MODEL', 'gemini-1.5-flash')
         self._client = None
     
     def _load_client(self):
@@ -31,14 +31,15 @@ class ExplanationLayer:
         if not self.use_gemini:
             return None
         try:
-            import google.generativeai as genai
             api_key = os.getenv('GEMINI_API_KEY')
             if not api_key:
                 return None
+            import google.generativeai as genai
             genai.configure(api_key=api_key)
             self._client = genai.GenerativeModel(self.gemini_model)
             return self._client
-        except Exception:
+        except Exception as exc:
+            print(f'Gemini init failed: {exc}')
             return None
     
     def _gemini_generate(self, prompt: str) -> str:
@@ -47,8 +48,12 @@ class ExplanationLayer:
             return self._template_fallback(prompt)
         try:
             response = model.generate_content(prompt)
-            return response.text.strip()
-        except Exception:
+            text = getattr(response, 'text', None)
+            if text:
+                return text.strip()
+            return self._template_fallback(prompt)
+        except Exception as exc:
+            print(f'Gemini generation failed: {exc}')
             return self._template_fallback(prompt)
     
     def _template_fallback(self, prompt: str) -> str:
